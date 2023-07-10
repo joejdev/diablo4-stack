@@ -1,0 +1,61 @@
+version: '3.7'
+services:
+    # Run the node application
+    client:
+        container_name: client
+        restart: unless-stopped
+        environment: 
+            - NODE_ENV=production
+        build:
+            context: ../diablo4-fe
+    server:
+        container_name: server
+        restart: unless-stopped
+        networks:
+          - app-network
+        depends_on:
+          mongodb-primary:
+            condition: service_started
+        environment: 
+          NODE_ENV: production
+          DB_URI: mongodb://mongodb-primary:27017/db
+          BNET_ID: 00da4cf6688a4660a6ec010ef5063f4f
+          BNET_SECRET: Su03rCN1lbeeqq5On4okpPSIYQlm3wxT
+        build:
+            context: ../diablo4-be
+        ports:
+          - "3030:3030"
+        expose:
+          - "3030"
+    mongodb-primary:
+      container_name: mongodb-primary
+      image: mongo:latest
+      restart: unless-stopped
+      networks:
+        - app-network 
+      ports:
+        - 27017:27017
+      volumes:
+        - mongodb-primary-data:/data/db
+
+    # Run the caddy server        
+    caddy:
+        image: caddy
+        container_name: caddy-service
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:            
+        - $PWD/Caddyfile:/etc/caddy/Caddyfile
+        - $PWD/site:/srv
+        - caddy_data:/data
+        - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config: 
+  mongodb-primary-data:
+
+networks:
+  app-network:
