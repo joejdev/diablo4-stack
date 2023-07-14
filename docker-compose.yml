@@ -6,8 +6,7 @@ services:
         restart: unless-stopped
         environment: 
             - NODE_ENV=production
-        build:
-            context: ../diablo4-fe
+        image: ghcr.io/joejdev/diablo4-fe:latest
     server:
         container_name: server
         restart: unless-stopped
@@ -21,8 +20,7 @@ services:
           DB_URI: mongodb://mongodb-primary:27017/db
           BNET_ID: 00da4cf6688a4660a6ec010ef5063f4f
           BNET_SECRET: Su03rCN1lbeeqq5On4okpPSIYQlm3wxT
-        build:
-            context: ../diablo4-be
+        image: ghcr.io/joejdev/diablo4-be:latest
         ports:
           - "3030:3030"
         expose:
